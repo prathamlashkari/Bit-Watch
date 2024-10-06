@@ -8,4 +8,5 @@ import com.bitwatch.models.UserModel;
 @Repository
 public interface UserRepository extends MongoRepository<UserModel, String> {
 
+  public UserModel findByEmail(String email);
 }
