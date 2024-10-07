@@ -7,5 +7,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class LoginReq {
   private String email;
-  private String passWord;
+  private String password;
 }

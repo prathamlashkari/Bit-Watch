@@ -53,7 +53,7 @@ public class AuthController {
     AuthResponse authResponse = new AuthResponse();
     authResponse.setJwt(jwt);
     authResponse.setStatus(true);
-    authResponse.setMsg("Register Success");
+    authResponse.setMsg("Register Successfully");
 
     return new ResponseEntity<>(authResponse, HttpStatus.CREATED);
   }
@@ -61,13 +61,13 @@ public class AuthController {
   @PostMapping("/login")
   public ResponseEntity<AuthResponse> login(@RequestBody LoginReq req) throws Exception {
 
-    Authentication authentication = authenticate(req.getEmail(), req.getPassWord());
+    Authentication authentication = authenticate(req.getEmail(), req.getPassword());
     SecurityContextHolder.getContext().setAuthentication(authentication);
     String jwt = JwtProvider.generateToken(authentication);
     AuthResponse authResponse = new AuthResponse();
     authResponse.setJwt(jwt);
     authResponse.setStatus(true);
-    authResponse.setMsg("Register Success");
+    authResponse.setMsg("Login Successfully");
 
     return new ResponseEntity<>(authResponse, HttpStatus.CREATED);
   }
