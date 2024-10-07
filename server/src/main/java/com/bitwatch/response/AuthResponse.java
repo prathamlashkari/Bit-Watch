@@ -9,5 +9,8 @@ public class AuthResponse {
 
   private String jwt;
   private String msg;
+  private boolean status;
+  private boolean isTwoFactorAuthEnabled;
+  private String session;
   private USER_ROLE role;
 }

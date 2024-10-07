@@ -1,17 +1,17 @@
 package com.bitwatch.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.bitwatch.config.JwtProvider;
 import com.bitwatch.models.UserModel;
 import com.bitwatch.repository.UserRepository;
 import com.bitwatch.request.SignupReq;
@@ -41,7 +41,12 @@ public class AuthController {
     Authentication authentication = new UsernamePasswordAuthenticationToken(savedUser.getEmail(),
         savedUser.getPassword());
     SecurityContextHolder.getContext().setAuthentication(authentication);
+    String jwt = JwtProvider.generateToken(authentication);
+    AuthResponse authResponse = new AuthResponse();
+    authResponse.setJwt(jwt);
+    authResponse.setStatus(true);
+    authResponse.setMsg("Register Success");
 
-    return null;
+    return new ResponseEntity<>(authResponse, HttpStatus.CREATED);
   }
 }
