@@ -34,8 +34,8 @@ This project is focused on predicting the price of Bitcoin using machine learnin
     source venv/bin/activate  # On Windows, use `venv\Scripts\activate`
 
 3. Install dependencies:
-  ```bash
-  pip install -r requirements.txt
+   ```bash
+   pip install -r requirements.txt
 
 ##Usage
 
