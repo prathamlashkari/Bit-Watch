@@ -29,13 +29,11 @@ This project is focused on predicting the price of Bitcoin using machine learnin
    cd bitcoin-price-prediction
 
 2. Create and activate a virtual environment:
-
   ```bash
     python -m venv venv
     source venv/bin/activate  # On Windows, use `venv\Scripts\activate`
 
 3. Install dependencies:
-
   ```bash
   pip install -r requirements.txt
 
@@ -47,7 +45,6 @@ This project is focused on predicting the price of Bitcoin using machine learnin
 
 
 2. Train the model:
-
   ```bash
   python train_model.py
 
