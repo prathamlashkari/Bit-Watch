@@ -8,6 +8,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,6 +22,7 @@ import com.bitwatch.request.LoginReq;
 import com.bitwatch.request.SignupReq;
 import com.bitwatch.response.AuthResponse;
 import com.bitwatch.service.CustomUserDetailSerivce;
+import com.bitwatch.service.EmailService;
 import com.bitwatch.service.TwoFactorAuthService;
 import com.bitwatch.utils.OtpUtils;
 
@@ -39,6 +41,9 @@ public class AuthController {
 
   @Autowired
   private TwoFactorAuthService twoFactorAuthService;
+
+  @Autowired
+  private EmailService emailService;
 
   @PostMapping("/signup")
   public ResponseEntity<AuthResponse> signup(@RequestBody SignupReq req) throws Exception {
@@ -83,6 +88,7 @@ public class AuthController {
         twoFactorAuthService.deleteTwoFactorOtp(oldTwoFactorOTP);
       }
       TwoFactorOTP newTwoFactorOTP = twoFactorAuthService.createTwoFactorOtp(userModel, opt, jwt);
+      emailService.sendVerificationOtpEmail(req.getEmail(), opt);
       authResponse.setSession(newTwoFactorOTP.getId());
       return new ResponseEntity<>(authResponse, HttpStatus.ACCEPTED);
     }
@@ -102,5 +108,18 @@ public class AuthController {
       throw new Exception("Invalid Password");
     }
     return new UsernamePasswordAuthenticationToken(email, password, userDetails.getAuthorities());
+  }
+
+  public ResponseEntity<AuthResponse> verifySigingOtp(@PathVariable String otp, @RequestBody String id)
+      throws Exception {
+    TwoFactorOTP twoFactorOTP = twoFactorAuthService.findById(id);
+    if (twoFactorAuthService.verfiyTwoFactorOtp(twoFactorOTP, otp)) {
+      AuthResponse res = new AuthResponse();
+      res.setMsg("Two factor Authentication verified");
+      res.setTwoFactorAuthEnabled(true);
+      res.setJwt(twoFactorOTP.getOtp());
+      return new ResponseEntity<>(res, HttpStatus.OK);
+    }
+    throw new Exception("Invalid Opt");
   }
 }
