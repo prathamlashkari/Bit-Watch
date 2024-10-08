@@ -14,12 +14,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bitwatch.config.JwtProvider;
+import com.bitwatch.models.TwoFactorOTP;
 import com.bitwatch.models.UserModel;
 import com.bitwatch.repository.UserRepository;
 import com.bitwatch.request.LoginReq;
 import com.bitwatch.request.SignupReq;
 import com.bitwatch.response.AuthResponse;
 import com.bitwatch.service.CustomUserDetailSerivce;
+import com.bitwatch.service.TwoFactorAuthService;
+import com.bitwatch.utils.OtpUtils;
 
 @RestController
 @RequestMapping("/")
@@ -33,6 +36,9 @@ public class AuthController {
 
   @Autowired
   private CustomUserDetailSerivce customUserDetailSerivce;
+
+  @Autowired
+  private TwoFactorAuthService twoFactorAuthService;
 
   @PostMapping("/signup")
   public ResponseEntity<AuthResponse> signup(@RequestBody SignupReq req) throws Exception {
@@ -66,10 +72,19 @@ public class AuthController {
     String jwt = JwtProvider.generateToken(authentication);
     AuthResponse authResponse = new AuthResponse();
 
+    UserModel userModel = userRepository.findByEmail(req.getEmail());
     if (req.getTwoFactorAuth().isEnalbled()) {
+
       authResponse.setMsg("Two factor auth is enabled");
       authResponse.setTwoFactorAuthEnabled(true);
-      // String opt = otpUtils
+      String opt = OtpUtils.generateOtp();
+      TwoFactorOTP oldTwoFactorOTP = twoFactorAuthService.findById(userModel.getId());
+      if (oldTwoFactorOTP != null) {
+        twoFactorAuthService.deleteTwoFactorOtp(oldTwoFactorOTP);
+      }
+      TwoFactorOTP newTwoFactorOTP = twoFactorAuthService.createTwoFactorOtp(userModel, opt, jwt);
+      authResponse.setSession(newTwoFactorOTP.getId());
+      return new ResponseEntity<>(authResponse, HttpStatus.ACCEPTED);
     }
     authResponse.setJwt(jwt);
     authResponse.setStatus(true);
