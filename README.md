@@ -27,33 +27,39 @@ This project is focused on predicting the price of Bitcoin using machine learnin
    ```bash
    git clone https://github.com/yourusername/bitcoin-price-prediction.git
    cd bitcoin-price-prediction
-Create and activate a virtual environment:
+
+2. Create and activate a virtual environment:
+
+  ```bash
+    python -m venv venv
+    source venv/bin/activate  # On Windows, use `venv\Scripts\activate`
+
+3. Install dependencies:
+
+  ```bash
+  pip install -r requirements.txt
+
+##Usage
+
+1. Run data collection script to get the latest Bitcoin price data:
+  ```bash
+  python data_collection.py
 
 
-python -m venv venv
-source venv/bin/activate  # On Windows, use `venv\Scripts\activate`
-Install dependencies:
+2. Train the model:
 
+  ```bash
+  python train_model.py
 
-pip install -r requirements.txt
-Usage
-Run data collection script to get the latest Bitcoin price data:
+3. Make predictions:
+  ```bash
+  python predict.py
 
+4. Evaluate the model performance:
+  ```bash
+  python evaluate.py
 
-python data_collection.py
-Train the model:
-
-
-python train_model.py
-Make predictions:
-
-
-python predict.py
-Evaluate the model performance:
-
-
-python evaluate.py
-Project Structure
+5. Project Structure
 
 bitcoin-price-prediction/
 │
@@ -71,10 +77,10 @@ Model Performance:
 RMSE: XX
 MAE: XX
 Visualizations: Plot of actual vs predicted Bitcoin prices over time.
-Contributing
+## Contributing
 Contributions are welcome! Please fork the repository and submit a pull request to propose any changes.
 
-License
+## License
 This project is licensed under the MIT License - see the LICENSE file for details.
 
 
