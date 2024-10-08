@@ -6,7 +6,7 @@ import lombok.Data;
 
 @Data
 @Document(collection = "TowFactorAuth")
-public class TwoFactorAuthModel {
+public class TwoFactorOTP {
 
   private String id;
   private String opt;
