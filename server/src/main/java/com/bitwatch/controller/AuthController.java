@@ -8,18 +8,23 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bitwatch.config.JwtProvider;
+import com.bitwatch.models.TwoFactorOTP;
 import com.bitwatch.models.UserModel;
 import com.bitwatch.repository.UserRepository;
 import com.bitwatch.request.LoginReq;
 import com.bitwatch.request.SignupReq;
 import com.bitwatch.response.AuthResponse;
 import com.bitwatch.service.CustomUserDetailSerivce;
+import com.bitwatch.service.EmailService;
+import com.bitwatch.service.TwoFactorAuthService;
+import com.bitwatch.utils.OtpUtils;
 
 @RestController
 @RequestMapping("/")
@@ -33,6 +38,12 @@ public class AuthController {
 
   @Autowired
   private CustomUserDetailSerivce customUserDetailSerivce;
+
+  @Autowired
+  private TwoFactorAuthService twoFactorAuthService;
+
+  @Autowired
+  private EmailService emailService;
 
   @PostMapping("/signup")
   public ResponseEntity<AuthResponse> signup(@RequestBody SignupReq req) throws Exception {
@@ -65,6 +76,22 @@ public class AuthController {
     SecurityContextHolder.getContext().setAuthentication(authentication);
     String jwt = JwtProvider.generateToken(authentication);
     AuthResponse authResponse = new AuthResponse();
+
+    UserModel userModel = userRepository.findByEmail(req.getEmail());
+    if (req.getTwoFactorAuth().isEnalbled()) {
+
+      authResponse.setMsg("Two factor auth is enabled");
+      authResponse.setTwoFactorAuthEnabled(true);
+      String opt = OtpUtils.generateOtp();
+      TwoFactorOTP oldTwoFactorOTP = twoFactorAuthService.findById(userModel.getId());
+      if (oldTwoFactorOTP != null) {
+        twoFactorAuthService.deleteTwoFactorOtp(oldTwoFactorOTP);
+      }
+      TwoFactorOTP newTwoFactorOTP = twoFactorAuthService.createTwoFactorOtp(userModel, opt, jwt);
+      emailService.sendVerificationOtpEmail(req.getEmail(), opt);
+      authResponse.setSession(newTwoFactorOTP.getId());
+      return new ResponseEntity<>(authResponse, HttpStatus.ACCEPTED);
+    }
     authResponse.setJwt(jwt);
     authResponse.setStatus(true);
     authResponse.setMsg("Login Successfully");
@@ -81,5 +108,18 @@ public class AuthController {
       throw new Exception("Invalid Password");
     }
     return new UsernamePasswordAuthenticationToken(email, password, userDetails.getAuthorities());
+  }
+
+  public ResponseEntity<AuthResponse> verifySigingOtp(@PathVariable String otp, @RequestBody String id)
+      throws Exception {
+    TwoFactorOTP twoFactorOTP = twoFactorAuthService.findById(id);
+    if (twoFactorAuthService.verfiyTwoFactorOtp(twoFactorOTP, otp)) {
+      AuthResponse res = new AuthResponse();
+      res.setMsg("Two factor Authentication verified");
+      res.setTwoFactorAuthEnabled(true);
+      res.setJwt(twoFactorOTP.getOtp());
+      return new ResponseEntity<>(res, HttpStatus.OK);
+    }
+    throw new Exception("Invalid Opt");
   }
 }
