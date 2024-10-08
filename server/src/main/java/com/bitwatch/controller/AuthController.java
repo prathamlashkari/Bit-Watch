@@ -65,6 +65,12 @@ public class AuthController {
     SecurityContextHolder.getContext().setAuthentication(authentication);
     String jwt = JwtProvider.generateToken(authentication);
     AuthResponse authResponse = new AuthResponse();
+
+    if (req.getTwoFactorAuth().isEnalbled()) {
+      authResponse.setMsg("Two factor auth is enabled");
+      authResponse.setTwoFactorAuthEnabled(true);
+      // String opt = otpUtils
+    }
     authResponse.setJwt(jwt);
     authResponse.setStatus(true);
     authResponse.setMsg("Login Successfully");
