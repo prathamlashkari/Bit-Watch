@@ -19,7 +19,6 @@ This project is focused on predicting the price of Bitcoin using machine learnin
   - Data Processing: `pandas`, `NumPy`
   - Visualization: `matplotlib`, `seaborn`
   - Data Source: `yfinance`, `CoinGecko API`
-  - Sentiment Analysis: `VADER`, `TextBlob`
 
 ## Installation
 
