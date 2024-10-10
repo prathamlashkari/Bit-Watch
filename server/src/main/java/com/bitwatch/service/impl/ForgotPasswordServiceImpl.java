@@ -1,20 +1,30 @@
 package com.bitwatch.service.impl;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.bitwatch.enums.VerificationType;
 import com.bitwatch.models.ForgotPassword;
 import com.bitwatch.models.UserModel;
+import com.bitwatch.repository.ForgotpasswordRepository;
 import com.bitwatch.service.ForgotPasswordService;
 
 @Service
 public class ForgotPasswordServiceImpl implements ForgotPasswordService {
 
+  @Autowired
+  private ForgotpasswordRepository forgotpasswordRepository;
+
   @Override
   public ForgotPassword createToken(UserModel userModel, String id, String otp, VerificationType verificationType,
       String sendTo) {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'createToken'");
+    ForgotPassword token = new ForgotPassword();
+    token.setUserid(userModel.getId());
+    token.setSendTo(sendTo);
+    token.setVerificationType(verificationType);
+    token.setOtp(otp);
+    token.setId(id);
+    return forgotpasswordRepository.save(token);
   }
 
   @Override
