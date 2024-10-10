@@ -14,6 +14,7 @@ public class ForgotPassword {
   @Id
   private String id;
   private String userid;
+  private String otp;
   private VerificationType verificationType;
-  private String sendTo
+  private String sendTo;
 }
