@@ -39,13 +39,12 @@ public class VerificationCodeServiceImpl implements VerificationCodeSerice {
   @Override
   public VerificationCode getvVerificationCodeByUserId(String userId) {
 
-    throw new UnsupportedOperationException("Unimplemented method 'getvVerificationCodeByUserId'");
+    return verificationCodeRepository.findByUserId(userId);
   }
 
   @Override
   public void deleteVerificationCodeById(VerificationCode verificationCode) {
-
-    throw new UnsupportedOperationException("Unimplemented method 'deleteVerificationCodeById'");
+    verificationCodeRepository.delete(verificationCode);
   }
 
 }
