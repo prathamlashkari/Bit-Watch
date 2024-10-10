@@ -8,4 +8,5 @@ import com.bitwatch.models.ForgotPassword;
 @Repository
 public interface ForgotpasswordRepository extends MongoRepository<ForgotPassword, String> {
 
+  public ForgotPassword findByUserId(String userId);
 }

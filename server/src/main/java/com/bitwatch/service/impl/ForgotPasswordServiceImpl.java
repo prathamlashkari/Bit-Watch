@@ -8,6 +8,7 @@ import com.bitwatch.models.ForgotPassword;
 import com.bitwatch.models.UserModel;
 import com.bitwatch.repository.ForgotpasswordRepository;
 import com.bitwatch.service.ForgotPasswordService;
+import java.util.*;
 
 @Service
 public class ForgotPasswordServiceImpl implements ForgotPasswordService {
@@ -29,20 +30,18 @@ public class ForgotPasswordServiceImpl implements ForgotPasswordService {
 
   @Override
   public ForgotPassword findById(String id) {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'findById'");
+    Optional<ForgotPassword> tokeOptional = forgotpasswordRepository.findById(id);
+    return tokeOptional.orElse(null);
   }
 
   @Override
   public ForgotPassword findByUser(String userId) {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'findByUser'");
+    return forgotpasswordRepository.findByUserId(userId);
   }
 
   @Override
   public void deleteToken(ForgotPassword token) {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'deleteToken'");
+    forgotpasswordRepository.delete(token);
   }
 
 }
