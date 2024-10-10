@@ -110,6 +110,7 @@ public class AuthController {
     return new UsernamePasswordAuthenticationToken(email, password, userDetails.getAuthorities());
   }
 
+  @PostMapping("/two-factor/otp/{otp}")
   public ResponseEntity<AuthResponse> verifySigingOtp(@PathVariable String otp, @RequestBody String id)
       throws Exception {
     TwoFactorOTP twoFactorOTP = twoFactorAuthService.findById(id);
