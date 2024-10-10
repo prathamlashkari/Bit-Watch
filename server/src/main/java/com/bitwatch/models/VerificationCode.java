@@ -16,5 +16,6 @@ public class VerificationCode {
   private String otp;
   private String userId;
   private String mobile;
+  private String email;
   private VerificationType verificationType;
 }

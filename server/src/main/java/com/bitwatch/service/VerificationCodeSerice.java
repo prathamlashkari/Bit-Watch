@@ -5,7 +5,7 @@ import com.bitwatch.models.UserModel;
 import com.bitwatch.models.VerificationCode;
 
 public interface VerificationCodeSerice {
-  VerificationCode sendVerificationCode(UserModel userModel, VerificationType verificationType);
+  VerificationCode sendVerificationCode(UserModel userModel, VerificationType verificationType) throws Exception;
 
   VerificationCode getVerificationCodeById(String id) throws Exception;
 

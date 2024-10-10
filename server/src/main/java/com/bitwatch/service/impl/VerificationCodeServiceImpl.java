@@ -19,7 +19,8 @@ public class VerificationCodeServiceImpl implements VerificationCodeSerice {
   private VerificationCodeRepository verificationCodeRepository;
 
   @Override
-  public VerificationCode sendVerificationCode(UserModel userModel, VerificationType verificationType) {
+  public VerificationCode sendVerificationCode(UserModel userModel, VerificationType verificationType)
+      throws Exception {
     VerificationCode verificationCode1 = new VerificationCode();
     verificationCode1.setOtp(OtpUtils.generateOtp());
     verificationCode1.setVerificationType(verificationType);

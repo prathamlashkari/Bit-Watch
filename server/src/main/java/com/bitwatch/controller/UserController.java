@@ -13,8 +13,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.bitwatch.enums.VerificationType;
 import com.bitwatch.models.UserModel;
+import com.bitwatch.models.VerificationCode;
 import com.bitwatch.service.EmailService;
 import com.bitwatch.service.UserService;
+import com.bitwatch.service.VerificationCodeSerice;
 
 @RestController
 @RequestMapping()
@@ -26,6 +28,9 @@ public class UserController {
   @Autowired
   private EmailService emailService;
 
+  @Autowired
+  private VerificationCodeSerice verificationCodeSerice;
+
   @GetMapping("api/users/prifile")
   public ResponseEntity<UserModel> getUserProfile(@RequestHeader("Authorization") String jwt) throws Exception {
     UserModel userModel = userService.findUserProfileByJwt(jwt);
@@ -34,20 +39,38 @@ public class UserController {
   }
 
   @PatchMapping("api/users/enable-two-factor/verify-otp/{otp}")
-  public ResponseEntity<UserModel> enableTwoFactorAuthentication(@RequestHeader("Authorization") String jwt)
+  public ResponseEntity<UserModel> enableTwoFactorAuthentication(@RequestHeader("Authorization") String jwt,
+      @PathVariable String otp)
       throws Exception {
     UserModel userModel = userService.findUserProfileByJwt(jwt);
-    userModel.setPassword("Secured");
-    return new ResponseEntity<>(userModel, HttpStatus.OK);
+    VerificationCode verificationCode = verificationCodeSerice.getvVerificationCodeByUserId(userModel.getId());
+    String sendTo = verificationCode.getVerificationType().equals(VerificationType.EMAIL) ? verificationCode.getEmail()
+        : verificationCode.getMobile();
+    boolean isVerified = verificationCode.getOtp().equals(otp);
+    if (isVerified) {
+      UserModel updateUser = userService.enalbeTwoFactorAuthentication(verificationCode.getVerificationType(),
+          userModel);
+      return new ResponseEntity<>(updateUser, HttpStatus.OK);
+
+    }
+    throw new Exception("Wrong Otp");
   }
 
   @PostMapping("api/users/verification/{verificationType}/send-otp")
-  public ResponseEntity<UserModel> sendVerificationOtp(@RequestHeader("Authorization") String jwt,
+  public ResponseEntity<String> sendVerificationOtp(@RequestHeader("Authorization") String jwt,
       @PathVariable VerificationType verificationType)
       throws Exception {
     UserModel userModel = userService.findUserProfileByJwt(jwt);
-    userModel.setPassword("Secured");
-    return new ResponseEntity<>(userModel, HttpStatus.OK);
+    VerificationCode verificationCode = verificationCodeSerice.getvVerificationCodeByUserId(userModel.getId());
+    if (verificationCode == null) {
+      verificationCode = verificationCodeSerice.sendVerificationCode(userModel, verificationType);
+    }
+
+    if (verificationType.equals(VerificationType.EMAIL)) {
+      emailService.sendVerificationOtpEmail(userModel.getEmail(), verificationCode.getOtp());
+    }
+
+    return new ResponseEntity<>("Verification Otp send Successfully", HttpStatus.OK);
   }
 
 }
