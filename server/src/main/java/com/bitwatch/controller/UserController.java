@@ -17,6 +17,7 @@ import com.bitwatch.models.VerificationCode;
 import com.bitwatch.service.EmailService;
 import com.bitwatch.service.UserService;
 import com.bitwatch.service.VerificationCodeSerice;
+import com.bitwatch.utils.OtpUtils;
 
 @RestController
 @RequestMapping()
@@ -70,6 +71,15 @@ public class UserController {
       emailService.sendVerificationOtpEmail(userModel.getEmail(), verificationCode.getOtp());
     }
 
+    return new ResponseEntity<>("Verification Otp send Successfully", HttpStatus.OK);
+  }
+
+  @PostMapping("api/users/reset-password/send-otp")
+  public ResponseEntity<String> sendForgotPasswordOtp(@RequestHeader("Authorization") String jwt,
+      @PathVariable VerificationType verificationType)
+      throws Exception {
+    UserModel userModel = userService.findUserProfileByJwt(jwt);
+    String otp = OtpUtils.generateOtp();
     return new ResponseEntity<>("Verification Otp send Successfully", HttpStatus.OK);
   }
 
