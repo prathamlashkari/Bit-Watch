@@ -7,14 +7,19 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bitwatch.enums.VerificationType;
+import com.bitwatch.models.ForgotPassword;
 import com.bitwatch.models.UserModel;
 import com.bitwatch.models.VerificationCode;
+import com.bitwatch.request.ForgotPasswordReq;
+import com.bitwatch.response.AuthResponse;
 import com.bitwatch.service.EmailService;
+import com.bitwatch.service.ForgotPasswordService;
 import com.bitwatch.service.UserService;
 import com.bitwatch.service.VerificationCodeSerice;
 import com.bitwatch.utils.OtpUtils;
@@ -28,6 +33,9 @@ public class UserController {
 
   @Autowired
   private EmailService emailService;
+
+  @Autowired
+  private ForgotPasswordService forgotPasswordService;
 
   @Autowired
   private VerificationCodeSerice verificationCodeSerice;
@@ -75,12 +83,23 @@ public class UserController {
   }
 
   @PostMapping("api/users/reset-password/send-otp")
-  public ResponseEntity<String> sendForgotPasswordOtp(@RequestHeader("Authorization") String jwt,
-      @PathVariable VerificationType verificationType)
+  public ResponseEntity<AuthResponse> sendForgotPasswordOtp(
+      @RequestBody ForgotPasswordReq req)
       throws Exception {
-    UserModel userModel = userService.findUserProfileByJwt(jwt);
+    UserModel userModel = userService.findUserByEmail(req.getSendTo());
     String otp = OtpUtils.generateOtp();
-    return new ResponseEntity<>("Verification Otp send Successfully", HttpStatus.OK);
+
+    ForgotPassword token = forgotPasswordService.findByUser(userModel.getId());
+    if (token == null) {
+      token = forgotPasswordService.createToken(userModel, otp, req.getVerificationType(), req.getSendTo());
+    }
+    if (req.getVerificationType().equals(VerificationType.EMAIL)) {
+      emailService.sendVerificationOtpEmail(userModel.getEmail(), token.getOtp());
+    }
+    AuthResponse res = new AuthResponse();
+    res.setSession(token.getId());
+    res.setMsg("Password reset otp sent Successfully");
+    return new ResponseEntity<>(res, HttpStatus.OK);
   }
 
 }

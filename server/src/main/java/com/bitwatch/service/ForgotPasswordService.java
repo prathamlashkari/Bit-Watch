@@ -6,7 +6,7 @@ import com.bitwatch.models.UserModel;
 
 public interface ForgotPasswordService {
 
-  ForgotPassword createToken(UserModel userModel, String id, String otp, VerificationType verificationType,
+  ForgotPassword createToken(UserModel userModel, String otp, VerificationType verificationType,
       String sendTo);
 
   ForgotPassword findById(String id);
