@@ -44,5 +44,4 @@ public class TwoFactorAuthServiceImpl implements TwoFactorAuthService {
   public void deleteTwoFactorOtp(TwoFactorOTP twoFactorOTP) {
     twoFactorOtpRepository.delete(twoFactorOTP);
   }
-
 }

@@ -22,7 +22,6 @@ public class UserServiceImpl implements UserService {
 
   @Override
   public UserModel findUserProfileByJwt(String jwt) throws Exception {
-
     String email = JwtProvider.getEmailFromToken(jwt);
     UserModel userModel = userRepository.findByEmail(email);
     if (userModel == null) {
@@ -33,7 +32,6 @@ public class UserServiceImpl implements UserService {
 
   @Override
   public UserModel findUserByEmail(String email) throws Exception {
-
     UserModel userModel = userRepository.findByEmail(email);
     if (userModel == null) {
       throw new Exception("User not found with this email");
@@ -43,7 +41,6 @@ public class UserServiceImpl implements UserService {
 
   @Override
   public UserModel findUserById(String id) throws Exception {
-
     Optional<UserModel> useropt = userRepository.findById(id);
     if (useropt.isEmpty()) {
       throw new Exception("User not found with this email");
@@ -63,9 +60,7 @@ public class UserServiceImpl implements UserService {
 
   @Override
   public UserModel updatePassword(UserModel user, String newPassword) {
-
     user.setPassword(passwordEncoder.encode(newPassword));
     return userRepository.save(user);
   }
-
 }

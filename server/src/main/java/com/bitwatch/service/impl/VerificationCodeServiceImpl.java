@@ -47,5 +47,4 @@ public class VerificationCodeServiceImpl implements VerificationCodeSerice {
   public void deleteVerificationCodeById(VerificationCode verificationCode) {
     verificationCodeRepository.delete(verificationCode);
   }
-
 }
