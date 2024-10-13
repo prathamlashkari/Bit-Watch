@@ -10,5 +10,4 @@ public class SignupReq {
   private String fullName;
   private String email;
   private String password;
-
 }
