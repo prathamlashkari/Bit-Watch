@@ -87,6 +87,7 @@ public class UserController {
       @RequestBody ForgotPasswordReq req)
       throws Exception {
     UserModel userModel = userService.findUserByEmail(req.getSendTo());
+    System.out.println(userModel);
     String otp = OtpUtils.generateOtp();
 
     ForgotPassword token = forgotPasswordService.findByUser(userModel.getId());
@@ -98,6 +99,7 @@ public class UserController {
     }
     AuthResponse res = new AuthResponse();
     res.setSession(token.getId());
+    System.out.println(res);
     res.setMsg("Password reset otp sent Successfully");
     return new ResponseEntity<>(res, HttpStatus.OK);
   }
