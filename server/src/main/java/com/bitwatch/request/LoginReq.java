@@ -11,5 +11,4 @@ public class LoginReq {
   private String email;
   private String password;
   private TwoFactorAuth twoFactorAuth;
-
 }
