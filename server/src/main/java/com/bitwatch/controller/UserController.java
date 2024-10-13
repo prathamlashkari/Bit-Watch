@@ -53,6 +53,7 @@ public class UserController {
       throws Exception {
     UserModel userModel = userService.findUserProfileByJwt(jwt);
     VerificationCode verificationCode = verificationCodeSerice.getvVerificationCodeByUserId(userModel.getId());
+    @SuppressWarnings("unused")
     String sendTo = verificationCode.getVerificationType().equals(VerificationType.EMAIL) ? verificationCode.getEmail()
         : verificationCode.getMobile();
     boolean isVerified = verificationCode.getOtp().equals(otp);
