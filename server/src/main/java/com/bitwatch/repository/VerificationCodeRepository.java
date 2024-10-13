@@ -7,6 +7,5 @@ import com.bitwatch.models.VerificationCode;
 
 @Repository
 public interface VerificationCodeRepository extends MongoRepository<VerificationCode, String> {
-
   public VerificationCode findByUserId(String userId);
 }

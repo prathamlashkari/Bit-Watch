@@ -7,7 +7,5 @@ import com.bitwatch.models.TwoFactorOTP;
 
 @Repository
 public interface TwoFactorOtpRepository extends MongoRepository<TwoFactorOTP, String> {
-
   TwoFactorOTP findByUserId(String userId);
-
 }
