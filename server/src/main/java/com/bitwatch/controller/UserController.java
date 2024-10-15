@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bitwatch.enums.VerificationType;
@@ -17,6 +18,7 @@ import com.bitwatch.models.ForgotPassword;
 import com.bitwatch.models.UserModel;
 import com.bitwatch.models.VerificationCode;
 import com.bitwatch.request.ForgotPasswordReq;
+import com.bitwatch.request.ResetPasswordRequest;
 import com.bitwatch.response.AuthResponse;
 import com.bitwatch.service.EmailService;
 import com.bitwatch.service.ForgotPasswordService;
@@ -104,22 +106,17 @@ public class UserController {
   }
 
   @PostMapping("auth/users/reset-password/verify-otp")
-  public ResponseEntity<AuthResponse> resetPassword(
-      @RequestBody ForgotPasswordReq req)
+  public ResponseEntity<UserModel> resetPassword(
+      @RequestParam String id,
+      @RequestBody ResetPasswordRequest req)
       throws Exception {
-    UserModel userModel = userService.findUserByEmail(req.getSendTo());
-    String otp = OtpUtils.generateOtp();
 
-    ForgotPassword token = forgotPasswordService.findByUser(userModel.getId());
-    if (token == null) {
-      token = forgotPasswordService.createToken(userModel, otp, req.getVerificationType(), req.getSendTo());
+    ForgotPassword forgotPassword = forgotPasswordService.findById(id);
+    boolean isVerified = forgotPassword.getOtp().equals(req.getOpt());
+    UserModel userModel = userService.findUserById(forgotPassword.getUserid());
+    if (isVerified) {
+      userService.updatePassword(userModel, req.getPassword());
     }
-    if (req.getVerificationType().equals(VerificationType.EMAIL)) {
-      emailService.sendVerificationOtpEmail(userModel.getEmail(), token.getOtp());
-    }
-    AuthResponse res = new AuthResponse();
-    res.setSession(token.getId());
-    res.setMsg("Password reset otp sent Successfully");
-    return new ResponseEntity<>(res, HttpStatus.OK);
+    return new ResponseEntity<>(null, HttpStatus.OK);
   }
 }
