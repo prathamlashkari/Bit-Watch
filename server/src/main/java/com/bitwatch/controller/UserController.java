@@ -103,21 +103,23 @@ public class UserController {
     return new ResponseEntity<>(res, HttpStatus.OK);
   }
 
-  @PostMapping("api/users/verification/{verificationType}/send-otp")
-  public ResponseEntity<String> sendVerificationOtp(@RequestHeader("Authorization") String jwt,
-      @PathVariable VerificationType verificationType)
+  @PostMapping("auth/users/reset-password/verify-otp")
+  public ResponseEntity<AuthResponse> resetPassword(
+      @RequestBody ForgotPasswordReq req)
       throws Exception {
-    UserModel userModel = userService.findUserProfileByJwt(jwt);
-    VerificationCode verificationCode = verificationCodeSerice.getvVerificationCodeByUserId(userModel.getId());
-    if (verificationCode == null) {
-      verificationCode = verificationCodeSerice.sendVerificationCode(userModel, verificationType);
-    }
+    UserModel userModel = userService.findUserByEmail(req.getSendTo());
+    String otp = OtpUtils.generateOtp();
 
-    if (verificationType.equals(VerificationType.EMAIL)) {
-      emailService.sendVerificationOtpEmail(userModel.getEmail(), verificationCode.getOtp());
+    ForgotPassword token = forgotPasswordService.findByUser(userModel.getId());
+    if (token == null) {
+      token = forgotPasswordService.createToken(userModel, otp, req.getVerificationType(), req.getSendTo());
     }
-
-    return new ResponseEntity<>("Verification Otp send Successfully", HttpStatus.OK);
+    if (req.getVerificationType().equals(VerificationType.EMAIL)) {
+      emailService.sendVerificationOtpEmail(userModel.getEmail(), token.getOtp());
+    }
+    AuthResponse res = new AuthResponse();
+    res.setSession(token.getId());
+    res.setMsg("Password reset otp sent Successfully");
+    return new ResponseEntity<>(res, HttpStatus.OK);
   }
-
 }
