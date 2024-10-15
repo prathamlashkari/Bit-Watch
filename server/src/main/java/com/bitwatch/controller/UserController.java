@@ -20,6 +20,7 @@ import com.bitwatch.models.VerificationCode;
 import com.bitwatch.request.ForgotPasswordReq;
 import com.bitwatch.request.ResetPasswordRequest;
 import com.bitwatch.response.AuthResponse;
+import com.bitwatch.response.MsgResponse;
 import com.bitwatch.service.EmailService;
 import com.bitwatch.service.ForgotPasswordService;
 import com.bitwatch.service.UserService;
@@ -106,7 +107,7 @@ public class UserController {
   }
 
   @PostMapping("auth/users/reset-password/verify-otp")
-  public ResponseEntity<UserModel> resetPassword(
+  public ResponseEntity<MsgResponse> resetPassword(
       @RequestParam String id,
       @RequestBody ResetPasswordRequest req)
       throws Exception {
@@ -116,7 +117,10 @@ public class UserController {
     UserModel userModel = userService.findUserById(forgotPassword.getUserid());
     if (isVerified) {
       userService.updatePassword(userModel, req.getPassword());
+      MsgResponse msg = new MsgResponse("password update Successfully");
+      return new ResponseEntity<>(msg, HttpStatus.OK);
     }
-    return new ResponseEntity<>(null, HttpStatus.OK);
+
+    throw new Exception("Wrong otp");
   }
 }
