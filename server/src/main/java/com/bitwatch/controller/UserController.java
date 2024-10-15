@@ -83,7 +83,7 @@ public class UserController {
     return new ResponseEntity<>("Verification Otp send Successfully", HttpStatus.OK);
   }
 
-  @PostMapping("api/users/reset-password/send-otp")
+  @PostMapping("auth/users/reset-password/send-otp")
   public ResponseEntity<AuthResponse> sendForgotPasswordOtp(
       @RequestBody ForgotPasswordReq req)
       throws Exception {
@@ -101,6 +101,23 @@ public class UserController {
     res.setSession(token.getId());
     res.setMsg("Password reset otp sent Successfully");
     return new ResponseEntity<>(res, HttpStatus.OK);
+  }
+
+  @PostMapping("api/users/verification/{verificationType}/send-otp")
+  public ResponseEntity<String> sendVerificationOtp(@RequestHeader("Authorization") String jwt,
+      @PathVariable VerificationType verificationType)
+      throws Exception {
+    UserModel userModel = userService.findUserProfileByJwt(jwt);
+    VerificationCode verificationCode = verificationCodeSerice.getvVerificationCodeByUserId(userModel.getId());
+    if (verificationCode == null) {
+      verificationCode = verificationCodeSerice.sendVerificationCode(userModel, verificationType);
+    }
+
+    if (verificationType.equals(VerificationType.EMAIL)) {
+      emailService.sendVerificationOtpEmail(userModel.getEmail(), verificationCode.getOtp());
+    }
+
+    return new ResponseEntity<>("Verification Otp send Successfully", HttpStatus.OK);
   }
 
 }
