@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bitwatch.enums.VerificationType;
@@ -17,7 +18,9 @@ import com.bitwatch.models.ForgotPassword;
 import com.bitwatch.models.UserModel;
 import com.bitwatch.models.VerificationCode;
 import com.bitwatch.request.ForgotPasswordReq;
+import com.bitwatch.request.ResetPasswordRequest;
 import com.bitwatch.response.AuthResponse;
+import com.bitwatch.response.MsgResponse;
 import com.bitwatch.service.EmailService;
 import com.bitwatch.service.ForgotPasswordService;
 import com.bitwatch.service.UserService;
@@ -83,7 +86,7 @@ public class UserController {
     return new ResponseEntity<>("Verification Otp send Successfully", HttpStatus.OK);
   }
 
-  @PostMapping("api/users/reset-password/send-otp")
+  @PostMapping("auth/users/reset-password/send-otp")
   public ResponseEntity<AuthResponse> sendForgotPasswordOtp(
       @RequestBody ForgotPasswordReq req)
       throws Exception {
@@ -103,4 +106,21 @@ public class UserController {
     return new ResponseEntity<>(res, HttpStatus.OK);
   }
 
+  @PostMapping("auth/users/reset-password/verify-otp")
+  public ResponseEntity<MsgResponse> resetPassword(
+      @RequestParam String id,
+      @RequestBody ResetPasswordRequest req)
+      throws Exception {
+
+    ForgotPassword forgotPassword = forgotPasswordService.findById(id);
+    boolean isVerified = forgotPassword.getOtp().equals(req.getOpt());
+    UserModel userModel = userService.findUserById(forgotPassword.getUserid());
+    if (isVerified) {
+      userService.updatePassword(userModel, req.getPassword());
+      MsgResponse msg = new MsgResponse("password update Successfully");
+      return new ResponseEntity<>(msg, HttpStatus.OK);
+    }
+
+    throw new Exception("Wrong otp");
+  }
 }
