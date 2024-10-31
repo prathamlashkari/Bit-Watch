@@ -42,7 +42,6 @@ This project is focused on predicting the price of Bitcoin using machine learnin
   ```bash
   python data_collection.py
 
-
 2. Train the model:
   ```bash
   python train_model.py
@@ -56,7 +55,6 @@ This project is focused on predicting the price of Bitcoin using machine learnin
   python evaluate.py
 
 5. Project Structure
-
 bitcoin-price-prediction/
 │
 ├── data/                   # Raw and processed data
